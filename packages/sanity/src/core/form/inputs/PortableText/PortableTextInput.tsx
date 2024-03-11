@@ -62,6 +62,7 @@ export function PortableTextInput(props: PortableTextInputProps) {
   const {
     editorRef: editorRefProp,
     elementProps,
+    expanded = false,
     hotkeys,
     markers = EMPTY_ARRAY,
     onChange,
@@ -99,10 +100,10 @@ export function PortableTextInput(props: PortableTextInputProps) {
   const {subscribe} = usePatches({path})
   const [ignoreValidationError, setIgnoreValidationError] = useState(false)
   const [invalidValue, setInvalidValue] = useState<InvalidValue | null>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [isActive, setIsActive] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(expanded)
+  const [isActive, setIsActive] = useState(expanded)
   const [isOffline, setIsOffline] = useState(false)
-  const [hasFocusWithin, setHasFocusWithin] = useState(false)
+  const [hasFocusWithin, setHasFocusWithin] = useState(expanded)
   const telemetry = useTelemetry()
 
   const toast = useToast()
@@ -129,6 +130,13 @@ export function PortableTextInput(props: PortableTextInputProps) {
       return next
     })
   }, [onFullScreenChange, telemetry])
+
+  // Update isFullscreen state when expanded prop changes
+  useEffect(() => {
+    if (expanded !== undefined && expanded !== isFullscreen) {
+      handleToggleFullscreen()
+    }
+  }, [expanded, isFullscreen, handleToggleFullscreen])
 
   // Reset invalidValue if new value is coming in from props
   useEffect(() => {
@@ -265,6 +273,10 @@ export function PortableTextInput(props: PortableTextInputProps) {
     }
   }, [editorRef, isActive])
 
+  const stableHotkeys = useMemo(() => {
+    return hotkeys
+  }, [hotkeys])
+
   return (
     <Box ref={innerElementRef}>
       {!ignoreValidationError && respondToInvalidContent}
@@ -283,7 +295,7 @@ export function PortableTextInput(props: PortableTextInputProps) {
               <Compositor
                 {...props}
                 hasFocusWithin={hasFocusWithin}
-                hotkeys={hotkeys}
+                hotkeys={stableHotkeys}
                 isActive={isActive}
                 isFullscreen={isFullscreen}
                 onActivate={handleActivate}

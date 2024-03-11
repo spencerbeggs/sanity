@@ -500,6 +500,12 @@ export interface PortableTextInputProps
    */
   editorRef?: React.MutableRefObject<PortableTextEditor | null>
   /**
+   * Set the expansion state of the editor by passing `true` or `false`. Can be
+   * used to set the initial expansion state of the editor or to modify the expansion
+   * state after the editor has been rendered from a parent component. Defaults to `false`.
+   */
+  expanded?: boolean
+  /**
    * Assign hotkeys that can be attached to custom editing functions
    */
   hotkeys?: HotkeyOptions
